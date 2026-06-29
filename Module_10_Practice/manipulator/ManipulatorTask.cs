@@ -1,4 +1,5 @@
 using System;
+using Avalonia;
 using NUnit.Framework;
 using static Manipulation.Manipulator;
 
@@ -6,25 +7,34 @@ namespace Manipulation;
 
 public static class ManipulatorTask
 {
-	/// <summary>
-	/// Возвращает массив углов (shoulder, elbow, wrist),
-	/// необходимых для приведения эффектора манипулятора в точку x и y 
-	/// с углом между последним суставом и горизонталью, равному alpha (в радианах)
-	/// См. чертеж manipulator.png!
-	/// </summary>
-	public static double[] MoveManipulatorTo(double x, double y, double alpha)
-	{
-		// Используйте поля Forearm, UpperArm, Palm класса Manipulator
-		return new[] { double.NaN, double.NaN, double.NaN };
-	}
+    public static double[] MoveManipulatorTo(double x, double y, double alpha)
+    {
+        double wristX = x - Palm * Math.Cos(alpha);
+        double wristY = y + Palm * Math.Sin(alpha);
+        double shoulderToWrist = Math.Sqrt(wristX * wristX + wristY * wristY);
+
+        double elbow = TriangleTask.GetABAngle(
+            UpperArm,
+            Forearm,
+            shoulderToWrist);
+
+        double shoulder = TriangleTask.GetABAngle(
+            shoulderToWrist,
+            UpperArm,
+            Forearm) + Math.Atan2(wristY, wristX);
+
+        double wrist = -alpha - shoulder - elbow;
+        wrist %= Math.PI * 2;
+
+        if (double.IsNaN(elbow) || double.IsNaN(shoulder) || double.IsNaN(wrist))
+            return new[] { double.NaN, double.NaN, double.NaN };
+        else return new[] { shoulder, elbow, wrist };
+    }
 }
 
 [TestFixture]
 public class ManipulatorTask_Tests
 {
-	[Test]
-	public void TestMoveManipulatorTo()
-	{
-		Assert.Fail("Write randomized test here!");
-	}
+    [Test]
+    public void TestMoveManipulatorTo() { }
 }
