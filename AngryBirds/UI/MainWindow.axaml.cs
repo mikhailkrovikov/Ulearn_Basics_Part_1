@@ -24,7 +24,7 @@ public partial class MainWindow : Window
 
 	public MainWindow()
 	{
-		InitializeComponent(true, false);
+		InitializeComponent(true);
 
 		canvas = this.FindControl<Canvas>("TestView");
 		list = this.FindControl<ListBox>("Tests");
