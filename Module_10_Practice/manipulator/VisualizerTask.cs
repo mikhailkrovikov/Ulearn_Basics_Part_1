@@ -82,9 +82,7 @@ public static class VisualizerTask
     public static void DrawManipulator(DrawingContext context, Point shoulderPos)
     {
         var joints = AnglesToCoordinatesTask.GetJointPositions(Shoulder, Elbow, Wrist);
-
         DrawReachableZone(context, ReachableAreaBrush, UnreachableAreaBrush, shoulderPos, joints);
-
         var formattedText = new FormattedText(
             $"X={X:0}, Y={Y:0}, Alpha={Alpha:0.00}",
             CultureInfo.InvariantCulture,
@@ -97,26 +95,23 @@ public static class VisualizerTask
             TextAlignment = TextAlignment.Center
         };
         context.DrawText(formattedText, new Point(10, 10));
-
         Point[] points = AnglesToCoordinatesTask.GetJointPositions(Shoulder, Elbow, Wrist);
-
-        context.DrawLine(ManipulatorPen,
-            ConvertMathToWindow(new Point(0, 0), shoulderPos),
-            ConvertMathToWindow(points[0], shoulderPos));
-
-        context.DrawLine(ManipulatorPen,
-            ConvertMathToWindow(points[0], shoulderPos),
-            ConvertMathToWindow(points[1], shoulderPos));
-
-        context.DrawLine(ManipulatorPen,
-            ConvertMathToWindow(points[1], shoulderPos),
-            ConvertMathToWindow(points[2], shoulderPos));
-
+        DrawLineContext(context, shoulderPos, new Point(0, 0), points[0]);
+        DrawLineContext(context, shoulderPos, points[0], points[1]);
+        DrawLineContext(context, shoulderPos, points[1], points[2]);
         context.DrawEllipse(JointBrush, null, ConvertMathToWindow(new Point(0, 0), shoulderPos), 10, 10);
         context.DrawEllipse(JointBrush, null, ConvertMathToWindow(points[0], shoulderPos), 10, 10);
         context.DrawEllipse(JointBrush, null, ConvertMathToWindow(points[1], shoulderPos), 10, 10);
         context.DrawEllipse(JointBrush, null, ConvertMathToWindow(points[2], shoulderPos), 10, 10);
     }
+
+    private static void DrawLineContext(DrawingContext context, Point shoulderPos, Point start, Point end)
+    {
+        context.DrawLine(ManipulatorPen,
+            ConvertMathToWindow(start, shoulderPos),
+            ConvertMathToWindow(end, shoulderPos));
+    }
+
 
     private static void DrawReachableZone(
         DrawingContext context,
