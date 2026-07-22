@@ -7,19 +7,26 @@ internal static class SobelFilterTask
     {
         var width = g.GetLength(0);
         var height = g.GetLength(1);
+        var sxWidth = sx.GetLength(0);
+        var sxHeight = sx.GetLength(1);
+        var halfX = sxWidth / 2;
+        var halfY = sxHeight / 2;
         var result = new double[width, height];
-        for (int x = 1; x < width - 1; x++)
-            for (int y = 1; y < height - 1; y++)
+
+        for (int i = halfX; i < width - halfX; i++)
+            for (int j = halfY; j < height - halfY; j++)
             {
-                // Вместо этого кода должно быть поэлементное умножение матриц sx и полученной транспонированием из неё sy на окрестность точки (x, y)
-                // Такая операция ещё называется свёрткой (Сonvolution)
-                var gx = 
-                    -g[x - 1, y - 1] - 2 * g[x, y - 1] - g[x + 1, y - 1] 
-                    + g[x - 1, y + 1] + 2 * g[x, y + 1] + g[x + 1, y + 1];
-                var gy = 
-                    -g[x - 1, y - 1] - 2 * g[x - 1, y] - g[x - 1, y + 1] 
-                    + g[x + 1, y - 1] + 2 * g[x + 1, y] + g[x + 1, y + 1];
-                result[x, y] = Math.Sqrt(gx * gx + gy * gy);
+                var gx = 0.0;
+                var gy = 0.0;
+
+                for (int k = 0; k < sxWidth; k++)
+                    for (int l = 0; l < sxHeight; l++)
+                    {
+                        var p = g[i + k - halfX, j + l - halfY];
+                        gx += p * sx[k, l];
+                        gy += p * sx[l, k];
+                    }
+                result[i, j] = Math.Sqrt(gx * gx + gy * gy);
             }
         return result;
     }
